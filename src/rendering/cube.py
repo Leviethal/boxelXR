@@ -1,8 +1,8 @@
 from OpenGL.GL import *
 
 class Cube:
-    def __init__(self):
-        self.position = (0, 0, 0)
+    def __init__(self, position=(0, 0, 0)):
+        self.position = position
 
     def set_position(self, pos):
         self.position = pos

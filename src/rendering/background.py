@@ -1,6 +1,7 @@
 from OpenGL.GL import *
 
 def draw_background(texture_id):
+    glDisable(GL_LIGHTING)
     glDisable(GL_DEPTH_TEST)
 
     glMatrixMode(GL_PROJECTION)
@@ -31,4 +32,6 @@ def draw_background(texture_id):
     glPopMatrix()
     glMatrixMode(GL_MODELVIEW)
 
+    # 🔵 RESTORE STATE FOR 3D
     glEnable(GL_DEPTH_TEST)
+    glEnable(GL_LIGHTING)
