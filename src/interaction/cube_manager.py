@@ -11,16 +11,21 @@ class CubeManager:
         self.preview_cube = Cube(snapped)
 
     def update_preview(self, pos):
-        if self.preview_cube:
-            snapped = self.voxel_grid.snap(pos)
+        if not self.preview_cube:
+            return
+
+        snapped = self.voxel_grid.snap(pos)
+
+        if snapped != self.preview_cube.position:
             self.preview_cube.set_position(snapped)
 
     def finalize_preview(self):
-        if self.preview_cube:
-            pos = self.preview_cube.position
+        if not self.preview_cube:
+            return
 
-            final_pos = self.voxel_grid.place(pos)
-            self.preview_cube.set_position(final_pos)
-            self.placed_cubes.append(self.preview_cube)
+        pos = self.preview_cube.position
+        final_pos = self.voxel_grid.place(pos)
 
-            self.preview_cube = None
+        self.preview_cube.set_position(final_pos)
+        self.placed_cubes.append(self.preview_cube)
+        self.preview_cube = None

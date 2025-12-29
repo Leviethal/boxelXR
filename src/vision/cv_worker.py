@@ -1,12 +1,24 @@
 import cv2
 import mediapipe as mp
 import numpy as np
+import time
+
 
 def cv_loop(camera, hand_tracker, gesture, hand_state):
     mp_draw = mp.solutions.drawing_utils
     mp_hands = mp.solutions.hands
 
     while True:
+        last_time = 0
+        FPS_LIMIT = 15
+        FRAME_TIME = 1.0 / FPS_LIMIT
+
+        now = time.time()
+        if now - last_time < FRAME_TIME:
+            continue
+        last_time = now
+
+
         frame = camera.get_frame()
         if frame is None:
             break
