@@ -1,0 +1,24 @@
+camera:
+  type: "webcam"        # webcam | vr
+  index: 0
+  width: 1280
+  height: 720
+
+hand_tracking:
+  max_hands: 1
+  detection_confidence: 0.7
+  tracking_confidence: 0.7
+
+gestures:
+  pinch_threshold: 0.04
+  smoothing_factor: 0.7
+
+rendering:
+  fov: 60
+  near_plane: 0.1
+  far_plane: 100.0
+  grid_size: 0.1
+
+voxel:
+  snap: true
+  grid_dim: [50, 50, 50]
