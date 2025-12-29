@@ -1,11 +1,18 @@
-import cv2
+import threading
 import yaml
+
 from camera.webcam_camera import WebcamCamera
 from vision.hand_tracker import HandTracker
 from vision.gestures import GestureRecognizer
-import mediapipe as mp
+from vision.cv_worker import cv_loop
+from interaction.hand_state import HandState
 
-with open("../config/config.yaml") as f:
+from rendering.window import GLWindow
+from rendering.cube import Cube
+from rendering.camera_texture import CameraTexture
+from rendering.background import draw_background
+
+with open("config/config.yaml") as f:
     config = yaml.safe_load(f)
 
 camera = WebcamCamera(
@@ -17,34 +24,37 @@ camera = WebcamCamera(
 hand_tracker = HandTracker(config["hand_tracking"])
 gesture = GestureRecognizer(config["gestures"]["pinch_threshold"])
 
-mp_draw = mp.solutions.drawing_utils
-mp_hands = mp.solutions.hands
+hand_state = HandState()
 
-while True:
-    frame = camera.get_frame()
-    if frame is None:
-        break
+cv_thread = threading.Thread(
+    target=cv_loop,
+    args=(camera, hand_tracker, gesture, hand_state),
+    daemon=True
+)
+cv_thread.start()
 
-    hands = hand_tracker.process(frame)
-    if hands:
-        for hand in hands:
-            mp_draw.draw_landmarks(
-                frame,
-                hand,
-                mp_hands.HAND_CONNECTIONS
-            )
+window = GLWindow(
+    config["camera"]["width"],
+    config["camera"]["height"]
+)
 
-            started, holding, ended = gesture.detect_pinch(hand.landmark)
-            if started:
-                print("PINCH START")
-            if ended:
-                print("PINCH END")
+cube = Cube()
+camera_tex = CameraTexture(
+    config["camera"]["width"],
+    config["camera"]["height"]
+)
 
-    cv2.imshow("BoxelXR - Hand Debug", frame)
+while window.poll_events():
+    window.clear()
 
-    # VERY IMPORTANT
-    if cv2.waitKey(1) & 0xFF == 27:  # ESC to exit
-        break
+    pos, pinching, frame = hand_state.get()
 
-camera.release()
-cv2.destroyAllWindows()
+    if frame is not None:
+        camera_tex.update(frame)
+        draw_background(camera_tex.texture_id)
+
+    if pinching:
+        cube.set_position(pos)
+
+    cube.draw()
+    window.swap()

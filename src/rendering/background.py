@@ -1,6 +1,8 @@
 from OpenGL.GL import *
 
 def draw_background(texture_id):
+    # --- background must NOT be lit ---
+    glDisable(GL_LIGHTING)
     glDisable(GL_DEPTH_TEST)
 
     glMatrixMode(GL_PROJECTION)
@@ -15,7 +17,7 @@ def draw_background(texture_id):
     glEnable(GL_TEXTURE_2D)
     glBindTexture(GL_TEXTURE_2D, texture_id)
 
-    glColor3f(1.0, 1.0, 1.0)
+    glColor3f(1.0, 1.0, 1.0)  # important: no tint
 
     glBegin(GL_QUADS)
     glTexCoord2f(0, 0); glVertex2f(0, 0)
@@ -31,4 +33,6 @@ def draw_background(texture_id):
     glPopMatrix()
     glMatrixMode(GL_MODELVIEW)
 
+    # --- restore for 3D objects ---
     glEnable(GL_DEPTH_TEST)
+    glEnable(GL_LIGHTING)

@@ -12,6 +12,7 @@ class GLWindow:
         glEnable(GL_LIGHTING)
         glEnable(GL_LIGHT0)
         glEnable(GL_COLOR_MATERIAL)
+        glClearColor(0.0, 0.0, 0.0, 1.0)
 
         glLightfv(GL_LIGHT0, GL_POSITION, (5, 5, 5, 1))
         glLightfv(GL_LIGHT0, GL_DIFFUSE, (1, 1, 1, 1))

@@ -1,18 +1,18 @@
 import threading
 import yaml
 
-from camera.webcam_camera import WebcamCamera
-from vision.hand_tracker import HandTracker
-from vision.gestures import GestureRecognizer
-from vision.cv_worker import cv_loop
-from interaction.hand_state import HandState
+from src.camera.webcam_camera import WebcamCamera
+from src.vision.hand_tracker import HandTracker
+from src.vision.gestures import GestureRecognizer
+from src.vision.cv_worker import cv_loop
+from src.interaction.hand_state import HandState
 
-from rendering.window import GLWindow
-from rendering.cube import Cube
-from rendering.camera_texture import CameraTexture
-from rendering.background import draw_background
+from src.rendering.window import GLWindow
+from src.rendering.cube import Cube
+from src.rendering.camera_texture import CameraTexture
+from src.rendering.background import draw_background
 
-with open("../config/config.yaml") as f:
+with open("config/config.yaml") as f:
     config = yaml.safe_load(f)
 
 camera = WebcamCamera(
