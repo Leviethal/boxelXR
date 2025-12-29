@@ -10,18 +10,20 @@ from interaction.hand_state import HandState
 from rendering.window import GLWindow
 from rendering.camera_texture import CameraTexture
 from rendering.background import draw_background
+from rendering.mask_texture import MaskTexture
+from rendering.draw_hand_depth import draw_hand_depth
 
 from interaction.voxel_grid import VoxelGrid
 from interaction.cube_manager import CubeManager
 
 # -------------------------------
-# Load config
+# Config
 # -------------------------------
 with open("../config/config.yaml") as f:
     config = yaml.safe_load(f)
 
 # -------------------------------
-# Camera + CV setup
+# CV setup
 # -------------------------------
 camera = WebcamCamera(
     config["camera"]["index"],
@@ -42,7 +44,7 @@ cv_thread = threading.Thread(
 cv_thread.start()
 
 # -------------------------------
-# OpenGL / MR setup
+# OpenGL setup
 # -------------------------------
 window = GLWindow(
     config["camera"]["width"],
@@ -54,36 +56,44 @@ camera_tex = CameraTexture(
     config["camera"]["height"]
 )
 
+mask_tex = MaskTexture(
+    config["camera"]["width"],
+    config["camera"]["height"]
+)
+
 # -------------------------------
-# Voxel system (FEATURE A)
+# Voxel system
 # -------------------------------
 voxel_grid = VoxelGrid(grid_size=1.0)
 cube_manager = CubeManager(voxel_grid)
 
 # -------------------------------
-# Main render loop
+# Main loop
 # -------------------------------
 while window.poll_events():
     window.clear()
 
-    pos, pinching, frame = hand_state.get()
+    pos, pinching, frame, mask = hand_state.get()
 
-    # Draw camera background
+    # Background
     if frame is not None:
         camera_tex.update(frame)
         draw_background(camera_tex.texture_id)
 
-    # -------- Interaction Logic --------
+    # Hand depth (OCCLUSION)
+    if mask is not None:
+        mask_tex.update(mask)
+        draw_hand_depth(mask_tex.tex_id)
+
+    # Interaction
     if pinching and cube_manager.preview_cube is None:
         cube_manager.start_preview(pos)
-
     elif pinching:
         cube_manager.update_preview(pos)
-
     elif not pinching and cube_manager.preview_cube:
         cube_manager.finalize_preview()
 
-    # -------- Render Cubes --------
+    # Render cubes
     for cube in cube_manager.placed_cubes:
         cube.draw()
 
