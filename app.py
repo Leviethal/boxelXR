@@ -33,10 +33,7 @@ cv_thread = threading.Thread(
 )
 cv_thread.start()
 
-window = GLWindow(
-    config["camera"]["width"],
-    config["camera"]["height"]
-)
+window = GLWindow()
 
 cube = Cube()
 camera_tex = CameraTexture(
